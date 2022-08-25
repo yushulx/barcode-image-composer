@@ -1,5 +1,4 @@
 import argparse
-from genericpath import isfile
 from imgcomposer import ImageManager
 from imgcomposer.upca import UPCACode
 from imgcomposer.qrcode import Qrcode
@@ -9,13 +8,13 @@ import numpy as np
 import os
 import cv2
 
-def process_file(input, output):
+def process_file(imageManager, base, index, input, output):
     bg_image = cv2.imread(input)
     (height, width) = bg_image.shape[:2]
     wRatio = width / 1039; hRatio = height / 591
     upca_renderer = imageManager.Renderer(wRatio * 10, hRatio * 140, (10, 10), UPCACode(base, 0.5, cv2.ROTATE_90_CLOCKWISE))
     dm_renderer = imageManager.Renderer(wRatio * 920, hRatio * 40, (10, 10), DataMatrixCode(str(index), 1.5, -1))
-    qr_renderer = imageManager.Renderer(wRatio * 20, hRatio * 390, (10, 10), Qrcode(str(index), 0.5, -1))
+    qr_renderer = imageManager.Renderer(wRatio * 20, hRatio * 390, (10, 10), Qrcode('www.dynamsoft.com', 0.4, -1))
     renderers = [upca_renderer, dm_renderer, qr_renderer]
     composed_image = imageManager.compose(bg_image, renderers)
     # cv2.imshow('composed_image', composed_image)
@@ -49,14 +48,14 @@ try:
     for i in range(times):
         if os.path.isfile(input):
             print('Processing ' + input)
-            process_file(input, output)
+            process_file(imageManager, base, index, input, output)
             base = str(int(base) + 1)
             index += 1
         else:
             filelist = os.listdir(input)
             for file in filelist:
                 print('Processing ' + file)
-                process_file(os.path.join(input, file), output)
+                process_file(imageManager, base, index, os.path.join(input, file), output)
                 base = str(int(base) + 1)
                 index += 1
             

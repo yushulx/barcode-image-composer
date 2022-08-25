@@ -1,162 +1,101 @@
-# Python Extension: MRZ Scanner SDK 
-The project is a Python-C++ binding of [Dynamsoft Label Recognizer](https://www.dynamsoft.com/label-recognition/overview/). It aims to help developers build **Python MRZ scanner** apps on Windows and Linux.
+# Barcode Image Composer
+The project is used to compose an image set with barcode, QR code and DataMatrix.
 
-## License Key
-Get a [30-day FREE trial license](https://www.dynamsoft.com/customer/license/trialLicense/?product=dlr) to activate the SDK.
-
-
-## Supported Python Edition
-* Python 3.x
+![barcode image composer](https://www.dynamsoft.com/codepool//img/2022/08/barcode-image-composer.png)
 
 ## Install Dependencies
 ```bash 
-pip install mrz opencv-python
+pip install python-barcode pylibdmtx opencv-python pillow
 ```
+
+## Supported Barcode Types
+- UPCA
+- QR Code
+- DataMatrix
 
 ## Command-line Usage
 ```bash 
-$ scanmrz <file-name> -l <license-key>
-
-# Show the image with OpenCV
-$ scanmrz <file-name> -u 1 -l <license-key>
+$ imgcompose [-t TIMES] [-o OUTPUT] image-source
 ```
 
-![python mrz scanner](https://www.dynamsoft.com/codepool/img/2022/08/python-mrz-scanner.png)
+## Sample Code
 
-## Quick Start
 ```python
-import mrzscanner
-from mrz.checker.td1 import TD1CodeChecker
-from mrz.checker.td2 import TD2CodeChecker
-from mrz.checker.td3 import TD3CodeChecker
-from mrz.checker.mrva import MRVACodeChecker
-from mrz.checker.mrvb import MRVBCodeChecker
+import argparse
+from imgcomposer import ImageManager
+from imgcomposer.upca import UPCACode
+from imgcomposer.qrcode import Qrcode
+from imgcomposer.datamatrix import DataMatrixCode
+import sys
+import numpy as np
+import os
+import cv2
 
-def check(lines):
-    try:
-        td1_check = TD1CodeChecker(lines)
-        if bool(td1_check):
-            return "TD1", td1_check.fields()
-    except Exception as err:
-        pass
+def process_file(imageManager, base, index, input, output):
+    bg_image = cv2.imread(input)
+    (height, width) = bg_image.shape[:2]
+    wRatio = width / 1039; hRatio = height / 591
+    upca_renderer = imageManager.Renderer(wRatio * 10, hRatio * 140, (10, 10), UPCACode(base, 0.5, cv2.ROTATE_90_CLOCKWISE))
+    dm_renderer = imageManager.Renderer(wRatio * 920, hRatio * 40, (10, 10), DataMatrixCode(str(index), 1.5, -1))
+    qr_renderer = imageManager.Renderer(wRatio * 20, hRatio * 390, (10, 10), Qrcode('www.dynamsoft.com', 0.4, -1))
+    renderers = [upca_renderer, dm_renderer, qr_renderer]
+    composed_image = imageManager.compose(bg_image, renderers)
+    # cv2.imshow('composed_image', composed_image)
+    outfile = '{0}x{1}_{2}.png'.format(bg_image.shape[1], bg_image.shape[0], index)
+    cv2.imwrite(os.path.join(output, outfile), bg_image)
     
-    try:
-        td2_check = TD2CodeChecker(lines)
-        if bool(td2_check):
-            return "TD2", td2_check.fields()
-    except Exception as err:
-        pass
+parser = argparse.ArgumentParser(description='Compose images with barcode, QR code, and DataMatrix code.')
+parser.add_argument('source', help='An image file or a folder containing image files')
+parser.add_argument('-t', '--times', default=1, type=int, help='Specify the number of times to compose the image')
+parser.add_argument('-o', '--output', default='', type=str, help='Image output folder')
+args = parser.parse_args()
+# print(args)
+try:
+    input = args.source
+    output = args.output
+    times = args.times
     
-    try:
-        td3_check = TD3CodeChecker(lines)
-        if bool(td3_check):
-            return "TD3", td3_check.fields()
-    except Exception as err:
-        pass
+    if not os.path.exists(input):
+        print('Source not found')
+        exit(-1)
     
-    try:
-        mrva_check = MRVACodeChecker(lines)
-        if bool(mrva_check):
-            return "MRVA", mrva_check.fields()
-    except Exception as err:
-        pass
-    
-    try:
-        mrvb_check = MRVBCodeChecker(lines)
-        if bool(mrvb_check):
-            return "MRVB", mrvb_check.fields()
-    except Exception as err:
-        pass
-    
-    return 'No valid MRZ information found'
-
-# set license
-mrzscanner.initLicense("DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==")
-
-# initialize mrz scanner
-scanner = mrzscanner.createInstance()
-
-# load MRZ model
-scanner.loadModel(mrzscanner.get_model_path())
-
-print('')
-# decodeFile()
-s = ""
-results = scanner.decodeFile("images/1.png")
-for result in results:
-    print(result.text)
-    s += result.text + '\n'
-print('')
-print(check(s[:-1]))
-print('')
+    if output == '':
+        output = os.getcwd()
+    else:
+        if not os.path.exists(output):
+            os.mkdir(output)
+        
+    imageManager = ImageManager()
+    base = '10000000000'
+    index = 0
+    for i in range(times):
+        if os.path.isfile(input):
+            print('Processing ' + input)
+            process_file(imageManager, base, index, input, output)
+            base = str(int(base) + 1)
+            index += 1
+        else:
+            filelist = os.listdir(input)
+            for file in filelist:
+                print('Processing ' + file)
+                process_file(imageManager, base, index, os.path.join(input, file), output)
+                base = str(int(base) + 1)
+                index += 1
+            
+    # cv2.waitKey(0)
+except Exception as err:
+    print(err)
+    sys.exit(1)
 ```
 
-## Methods
-- `mrzscanner.initLicense('YOUR-LICENSE-KEY')` # set the license globally
-    
-    ```python
-    mrzscanner.initLicense("DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==")
-    ```
-
-- `mrzscanner.createInstance()` # create a MRZ scanner instance
-    
-    ```python
-    scanner = mrzscanner.createInstance()
-    ```
-- `scanner.loadModel(<model configuration file>)` # load MRZ model
-    
-    ```python
-    scanner.loadModel(mrzscanner.get_model_path())
-    ```
-- `decodeFile(<image file>)` # recognize MRZ from an image file
-
-    ```python
-    results = scanner.decodeFile(<image-file>)
-    for result in results:
-        print(result.text)
-    ```
-- `decodeMat(<opencv mat data>)` # recognize MRZ from OpenCV Mat
-    ```python
-    import cv2
-    image = cv2.imread(<image-file>)
-    results = scanner.decodeMat(image)
-    for result in results:
-        print(result.text)
-    ```
-- `addAsyncListener(callback function)` # start a native thread and register a Python function for receiving the MRZ recognition results
-- `decodeMatAsync(<opencv mat data>)` # recognize MRZ from OpenCV Mat asynchronously
-    ```python
-    def callback(results):
-        s = ""
-        for result in results:
-            print(result.text)
-            s += result.text + '\n'
-    
-        print('')
-        print(check(s[:-1]))
-    
-    import cv2
-    image = cv2.imread(<image-file>)
-    scanner.addAsyncListener(callback)
-    for i in range (2):
-        scanner.decodeMatAsync(image)
-        sleep(1)
-    ```
-
-## How to Build the Python MRZ Scanner Extension
-- Create a source distribution:
+## How to Build the Package
+- Source distribution:
     
     ```bash
     python setup.py sdist
     ```
 
-- setuptools:
-    
-    ```bash
-    python setup.py build
-    python setup.py develop 
-    ```
-- Build wheel:
+- Wheel:
     
     ```bash
     pip wheel . --verbose
