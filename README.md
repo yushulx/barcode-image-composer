@@ -1,7 +1,7 @@
 # Barcode Image Composer
-The project is used to compose an image set with barcode, QR code and DataMatrix.
+The project is used to generate an image set with barcode, QR code and DataMatrix.
 
-![barcode image composer](https://www.dynamsoft.com/codepool//img/2022/08/barcode-image-composer.png)
+![barcode image composer](https://camo.githubusercontent.com/ec18f510ebc070d04389c92bf0d64e5f60e5c2a414260d971f2987c63d2e6184/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f2f696d672f323032322f30382f626172636f64652d696d6167652d636f6d706f7365722e706e67)
 
 ## Install Dependencies
 ```bash 
