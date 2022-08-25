@@ -11,9 +11,11 @@ import cv2
 
 def process_file(input, output):
     bg_image = cv2.imread(input)
-    upca_renderer = imageManager.Renderer(10, 140, (10, 10), UPCACode(base, 0.5, cv2.ROTATE_90_CLOCKWISE))
-    dm_renderer = imageManager.Renderer(920, 40, (10, 10), DataMatrixCode(str(index), 1.5, -1))
-    qr_renderer = imageManager.Renderer(20, 390, (10, 10), Qrcode(str(index), 0.5, -1))
+    (height, width) = bg_image.shape[:2]
+    wRatio = width / 1039; hRatio = height / 591
+    upca_renderer = imageManager.Renderer(wRatio * 10, hRatio * 140, (10, 10), UPCACode(base, 0.5, cv2.ROTATE_90_CLOCKWISE))
+    dm_renderer = imageManager.Renderer(wRatio * 920, hRatio * 40, (10, 10), DataMatrixCode(str(index), 1.5, -1))
+    qr_renderer = imageManager.Renderer(wRatio * 20, hRatio * 390, (10, 10), Qrcode(str(index), 0.5, -1))
     renderers = [upca_renderer, dm_renderer, qr_renderer]
     composed_image = imageManager.compose(bg_image, renderers)
     # cv2.imshow('composed_image', composed_image)

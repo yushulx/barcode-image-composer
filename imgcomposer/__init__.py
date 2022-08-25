@@ -6,8 +6,8 @@ class ImageManager:
         
     class Renderer:
         def __init__(self, left, top, color_picker, code_type):
-            self.left = left
-            self.top = top
+            self.left = int(left)
+            self.top = int(top)
             self.color_picker = color_picker
             self.code_type = code_type
 

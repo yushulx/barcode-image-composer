@@ -68,7 +68,7 @@ setup(name='barcode-image-composer',
       ],
       install_requires=['python-barcode', 'pylibdmtx', 'pillow', 'qrcode'],
       entry_points={
-          'console_scripts': ['imgcreate=composer.scripts:imgcreate']
+          'console_scripts': ['imgcompose=composer.scripts:imgcompose']
       },
       cmdclass={
           'install': CustomInstall,

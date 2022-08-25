@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import os
 
-def imgcreate():
+def imgcompose():
     parser = argparse.ArgumentParser(description='Generate barcode QR code image set')
     parser.add_argument('-s', '--src', type=str, help='Image source folder')
     parser.add_argument('-d', '--dst', type=str, help='Image output folder')
