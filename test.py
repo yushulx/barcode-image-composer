@@ -9,12 +9,11 @@ import numpy as np
 import os
 import cv2
 
-
 def process_file(input, output):
     bg_image = cv2.imread(input)
-    upca_renderer = imageManager.Renderer(10, 140, (10, 10), UPCACode(base, 0.5, 90))
-    dm_renderer = imageManager.Renderer(920, 40, (10, 10), DataMatrixCode(str(index), 1.5, 0))
-    qr_renderer = imageManager.Renderer(20, 390, (10, 10), Qrcode(str(index), 0.5, 0))
+    upca_renderer = imageManager.Renderer(10, 140, (10, 10), UPCACode(base, 0.5, cv2.ROTATE_90_CLOCKWISE))
+    dm_renderer = imageManager.Renderer(920, 40, (10, 10), DataMatrixCode(str(index), 1.5, -1))
+    qr_renderer = imageManager.Renderer(20, 390, (10, 10), Qrcode(str(index), 0.5, -1))
     renderers = [upca_renderer, dm_renderer, qr_renderer]
     composed_image = imageManager.compose(bg_image, renderers)
     # cv2.imshow('composed_image', composed_image)
@@ -22,7 +21,7 @@ def process_file(input, output):
     cv2.imwrite(os.path.join(output, outfile), bg_image)
     
 parser = argparse.ArgumentParser(description='Compose images with barcode, QR code, and DataMatrix code.')
-parser.add_argument('source', help='Specify an image file or a folder containing image files')
+parser.add_argument('source', help='An image file or a folder containing image files')
 parser.add_argument('-t', '--times', default=1, type=int, help='Specify the number of times to compose the image')
 parser.add_argument('-o', '--output', default='', type=str, help='Image output folder')
 args = parser.parse_args()

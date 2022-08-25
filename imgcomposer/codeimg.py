@@ -6,15 +6,21 @@ class CodeImage:
         self.scale_factor = scale_factor
         self.rotation = rotation
         
-    def rotate_image(self, src, angle):
+    def rotate_image(self, src, rotation):
         # (h, w) = src.shape[:2]
         # center = (w / 2, h / 2)
         # M = cv2.getRotationMatrix2D(center, angle, 1.0)
         # rotated = cv2.warpAffine(src, M, (w, h))
         # return rotated
-        return cv2.rotate(src, cv2.ROTATE_90_CLOCKWISE)
+        if rotation == cv2.ROTATE_180 or rotation == cv2.ROTATE_90_COUNTERCLOCKWISE or rotation == cv2.ROTATE_90_CLOCKWISE:
+            return cv2.rotate(src, rotation)
+        else:
+            return src
     
     def resize_image(self, src, scale_factor):
+        if self.scale_factor == 1:
+            return src
+        
         width = int(src.shape[1] * scale_factor)
         height = int(src.shape[0] * scale_factor)
         dim = (width, height)

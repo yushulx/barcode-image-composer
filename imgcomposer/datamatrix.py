@@ -11,12 +11,8 @@ class DataMatrixCode(CodeImage):
         encoded = encode(self.value.encode('utf8'))
         img = Image.frombytes('RGB', (encoded.width, encoded.height), encoded.pixels)
         src = numpy.array(img)
-        
-        if  self.rotation != 0: 
-            src = self.rotate_image(src, self.rotation)
-    
-        if self.scale_factor != 1:
-            src = self.resize_image(src, self.scale_factor)
+        src = self.rotate_image(src, self.rotation)
+        src = self.resize_image(src, self.scale_factor)
         
         return self.binarize_image(src)
         
