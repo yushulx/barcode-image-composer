@@ -35,15 +35,15 @@ class CustomInstall(install):
         install.run(self)
 
 
-setup(name='barcode-image-generator',
+setup(name='barcode-image-composer',
       version='1.0.0',
-      description='Machine readable zone (MRZ) reading SDK for passport, Visa, ID card and travel document.',
+      description='Compose images with barcode, QR code, and DataMatrix code.',
       long_description=long_description,
       long_description_content_type="text/markdown",
       author='yushulx',
-      url='https://github.com/yushulx/python-mrz-scanner-sdk',
+      url='https://github.com/yushulx/barcode-image-composer',
       license='MIT',
-      packages=['imgcreator'],
+      packages=['imgcomposer'],
       classifiers=[
            "Development Status :: 5 - Production/Stable",
            "Environment :: Console",
@@ -66,9 +66,9 @@ setup(name='barcode-image-generator',
           "Topic :: Scientific/Engineering",
           "Topic :: Software Development",
       ],
-      install_requires=['python-barcode', 'pylibdmtx'],
+      install_requires=['python-barcode', 'pylibdmtx', 'pillow', 'qrcode'],
       entry_points={
-          'console_scripts': ['imgcreate=imgcreator.scripts:imgcreate']
+          'console_scripts': ['imgcreate=composer.scripts:imgcreate']
       },
       cmdclass={
           'install': CustomInstall,

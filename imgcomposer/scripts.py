@@ -1,5 +1,5 @@
 import argparse
-import imgcreator
+import imgcomposer
 import sys
 import numpy as np
 import os
@@ -20,7 +20,7 @@ def imgcreate():
         if not os.path.isdir(dst_folder):
             os.mkdir(dst_folder)
             
-        imgcreator.ImageManager().generate(src_folder, dst_folder)
+        imgcomposer.ImageManager().generate(src_folder, dst_folder)
     
     except Exception as err:
         print(err)
