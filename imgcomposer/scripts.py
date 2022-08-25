@@ -49,14 +49,14 @@ def imgcompose():
         for i in range(times):
             if os.path.isfile(input):
                 print('Processing ' + input)
-                process_file(imageManager, input, output)
+                process_file(imageManager, base, index, input, output)
                 base = str(int(base) + 1)
                 index += 1
             else:
                 filelist = os.listdir(input)
                 for file in filelist:
                     print('Processing ' + file)
-                    process_file(imageManager, os.path.join(input, file), output)
+                    process_file(imageManager, base, index, os.path.join(input, file), output)
                     base = str(int(base) + 1)
                     index += 1
                 
